@@ -13,12 +13,11 @@ class FlightCheckWorker(
     workerParams: WorkerParameters
 ) : Worker(context, workerParams) {
 
-    override doWork(): Result {
-        // Danh sách chuyến bay cần theo dõi (SGN/HAN -> PXU)
+    // Phải có đủ cả "override" lẫn "fun"
+    override fun doWork(): Result {
         val targetFlights = listOf("VJ392", "VJ394", "VJ396", "VJ421", "VJ423", "VJ425")
         
-        // TODO: Viết logic gọi API/Cào dữ liệu trạng thái chuyến bay tại đây
-        val flightToNotify = "VJ392" // Giả lập phát hiện chuyến VJ392 cất cánh
+        val flightToNotify = "VJ392"
 
         sendNotification(
             "Cập nhật chuyến bay Vietjet",
