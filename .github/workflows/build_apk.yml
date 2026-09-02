@@ -20,6 +20,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # Cài đặt Gradle 8.5 chuẩn để tránh bị ép dùng Gradle 9.x trên runner
+      - name: Setup Gradle 8.5
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.5'
+
       - name: Build Debug APK
         run: gradle assembleDebug --no-daemon
 
