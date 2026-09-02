@@ -1,36 +1,53 @@
-name: Build Android APK
+package com.example.vjflighttracker
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+class FlightCheckWorker(
+    private val context: Context,
+    workerParams: WorkerParameters
+) : Worker(context, workerParams) {
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    override fun doWork(): Result {
+        val targetFlights = listOf("VJ392", "VJ394", "VJ396", "VJ421", "VJ423", "VJ425")
+        
+        val flightToNotify = "VJ392"
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+        sendNotification(
+            "Cập nhật chuyến bay Vietjet",
+            "Chuyến bay $flightToNotify đã cất cánh hướng về Pleiku (PXU)!"
+        )
 
-      # Cài đặt Gradle 8.5 chuẩn để tránh bị ép dùng Gradle 9.x trên runner
-      - name: Setup Gradle 8.5
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.5'
+        return Result.success()
+    }
 
-      - name: Build Debug APK
-        run: gradle assembleDebug --no-daemon
+    private fun sendNotification(title: String, message: String) {
+        val channelId = "vj_flight_channel"
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "Chuyến bay Vietjet PXU",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notification = NotificationCompat.Builder(context, channelId)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .build()
+
+        notificationManager.notify(1001, notification)
+    }
+}
