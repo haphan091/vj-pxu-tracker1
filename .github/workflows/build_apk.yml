@@ -13,6 +13,7 @@ class FlightCheckWorker(
     workerParams: WorkerParameters
 ) : Worker(context, workerParams) {
 
+    // Thêm từ khóa "fun" đúng cú pháp Kotlin
     override fun doWork(): Result {
         val targetFlights = listOf("VJ392", "VJ394", "VJ396", "VJ421", "VJ423", "VJ425")
         
