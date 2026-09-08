@@ -29,9 +29,13 @@ jobs:
         run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
       - name: Build release APK
         run: gradle assembleRelease --no-daemon
+      - name: Show generated APK
+        run: |
+          echo "Generated APK files:"
+          find app/build/outputs -type f -name '*.apk' -print
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: VJC-PXU-Alert-release
-          path: app/build/outputs/apk/release/app-release.apk
+          path: app/build/outputs/**/*.apk
           if-no-files-found: error
